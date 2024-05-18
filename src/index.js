@@ -1,8 +1,10 @@
 const express = require("express");
 const path = require("path");
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const multer = require('multer');
 const session = require('express-session');
-const collection = require("./config");
+const collection = require("./config"); // Ensure this points to your schema file
 
 const app = express();
 
@@ -24,6 +26,18 @@ app.use(session({
     cookie: { secure: false } // Use true if HTTPS is enabled
 }));
 
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
 app.get("/", (req, res) => {
     res.render("login");
 });
@@ -33,13 +47,17 @@ app.get("/signup", (req, res) => {
 });
 
 // Register User
-app.post("/signup", async (req, res) => {
+app.post("/signup", upload.single('image'), async (req, res) => {
     const data = {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         mobilenumber: req.body.mobilenumber,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        img: {
+            data: fs.readFileSync(req.file.path),
+            contentType: req.file.mimetype
+        }
     }
 
     // Check if the username already exists in the database
@@ -54,11 +72,19 @@ app.post("/signup", async (req, res) => {
 
         data.password = hashedPassword; // Replace the original password with the hashed one
 
-        const userdata = await collection.insertMany(data);
-        console.log(userdata);
-        res.redirect('/');
+        // Create a new instance of the Mongoose model
+        const newUser = new collection(data);
+
+        newUser.save()
+            .then(() => {
+                // Send a success response with a JSON object containing the redirect URL
+                return res.redirect("/");
+            })
+            .catch(err => res.status(500).send('Error signing up user: ' + err));
     }
 });
+
+
 
 // Login user 
 app.post("/login", async (req, res) => {
@@ -76,6 +102,7 @@ app.post("/login", async (req, res) => {
             req.session.firstname = check.firstname;
             req.session.lastname = check.lastname;
             req.session.mobilenumber = check.mobilenumber;
+            req.session.img = `data:${check.img.contentType};base64,${check.img.data.toString('base64')}`;
             res.redirect("/home");
         }
     } catch (error) {
@@ -91,11 +118,12 @@ app.get("/home", (req, res) => {
     res.render("home", {
         firstname: req.session.firstname,
         lastname: req.session.lastname,
-        mobilenumber: req.session.mobilenumber
+        mobilenumber: req.session.mobilenumber,
+        img: req.session.img
     });
 });
 
-const port = 5000;
+const port = 5001;
 
 app.listen(port, () => {
     console.log(`Server running on port: ${port}`);

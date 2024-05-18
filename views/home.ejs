@@ -6,32 +6,94 @@
     <title>Home</title>
     <link rel="stylesheet" href="/style.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+        }
+
         .form-group {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
+
         .form-group label {
-            margin-right: 10px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group .value {
+            background-color: #f1f1f1;
+            padding: 8px 10px;
+            width: 100%;
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .profile-img {
+            margin-bottom: 20px;
+        }
+
+        .profile-img img {
+            max-width: 100%;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+
+        .submit-btn {
+            background-color: #5cb85c;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .submit-btn:hover {
+            background-color: #4cae4c;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
         <h2>User Details</h2>
+        <div class="profile-img">
+            <img src="<%= img %>" alt="Profile Image">
+        </div>
         <form action="/">
             <div class="form-group">
                 <label for="firstname">First Name:</label>
-                <label for="name"><%= firstname %></label>
+                <div class="value" id="firstname"><%= firstname %></div>
             </div>
             <div class="form-group">
                 <label for="lastname">Last Name:</label>
-                <label for="lastname"><%= lastname %></label>
+                <div class="value" id="lastname"><%= lastname %></div>
             </div>
             <div class="form-group">
                 <label for="mobilenumber">Mobile Number:</label>
-                <label for="mobilenumber"><%= mobilenumber %></label>
+                <div class="value" id="mobilenumber"><%= mobilenumber %></div>
             </div>
-            <button type="submit" class="submit-btn">home</button>
+            <button type="submit" class="submit-btn">Home</button>
         </form>
     </div>
 </body>
