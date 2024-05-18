@@ -38,6 +38,6 @@ const Loginschema = new mongoose.Schema({
 });
 
 // collection part
-const collection = new mongoose.model("users", Loginschema);
+const collection = new mongoose.model("imageusers", Loginschema);
 
 module.exports = collection;
